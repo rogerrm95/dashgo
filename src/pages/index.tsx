@@ -3,7 +3,7 @@ import Image from 'next/image'
 
 import { Input } from '../components/Form/Input'
 
-import { Flex, Button, FormLabel, FormControl, Stack } from '@chakra-ui/react'
+import { Flex, Button, FormLabel, FormControl, Stack, Text } from '@chakra-ui/react'
 
 export default function SignIn() {
   return (
@@ -16,8 +16,13 @@ export default function SignIn() {
       <Flex
         h='100vh'
         w='100vw'
+        direction='column'
         align='center'
         justify='center'>
+
+        <Text mb='8' fontSize='6xl' fontWeight='bold'>
+          dashgo<Text as='span' color='pink.500'>.</Text>
+        </Text>
 
         <Flex
           as='form'
