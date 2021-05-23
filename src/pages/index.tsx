@@ -1,9 +1,7 @@
 import Head from 'next/head'
-import Image from 'next/image'
+import { Flex, Button, FormLabel, FormControl, Stack, Text } from '@chakra-ui/react'
 
 import { Input } from '../components/Form/Input'
-
-import { Flex, Button, FormLabel, FormControl, Stack, Text } from '@chakra-ui/react'
 
 export default function SignIn() {
   return (
@@ -37,7 +35,6 @@ export default function SignIn() {
             <Input name='email' label='E-mail' type='email' />
             <Input name='password' label='Senha' type='password' />
           </Stack>
-
 
           <Button type='submit' mt='6' colorScheme='pink' size='lg'>
             Entrar
