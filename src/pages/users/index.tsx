@@ -4,6 +4,7 @@ import {
     Button,
     Flex,
     Icon,
+    Spinner,
     Table,
     Thead,
     Tr,
@@ -14,6 +15,7 @@ import {
     Text,
     useBreakpointValue
 } from "@chakra-ui/react";
+import { useQuery } from 'react-query'
 
 import { RiAddLine, RiPencilLine } from "react-icons/ri";
 
@@ -24,6 +26,25 @@ import { Pagination } from "../../components/Pagination";
 import { Sidebar } from "../../components/Sidebar";
 
 export default function UserList() {
+
+    const { data, isLoading, error } = useQuery('users', async () => {
+        const response = await fetch('http://localhost:3000/api/users').then(res => res)
+        const data = await response.json()
+
+        const users = data.users.map(user => {
+            return {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                createdAt: new Date(user.createdAt).toLocaleDateString('pt-BR', {
+                    day: '2-digit',
+                    month: "long",
+                    year: 'numeric'
+                })
+            }
+        })
+        return users
+    }, { staleTime: 1000 * 10 })
 
     const isWideVersion = useBreakpointValue({
         base: false,
@@ -54,85 +75,74 @@ export default function UserList() {
                         </Link>
                     </Flex>
 
-                    <Table colorScheme='whiteAlpha'>
-                        <Thead>
-                            <Tr>
-                                <Th px={['4', '4', '6']} color='gray.300' w='8'>
-                                    <Checkbox colorScheme='pink' />
-                                </Th>
-                                <Th>
-                                    Usuário
-                                </Th>
+                    {isLoading ? (
+                        <Flex justify='center'>
+                            <Spinner />
+                        </Flex>
+                    ) : error ? (
+                        <Flex justify='center'>
+                            <Text>
+                                Falha ao obter dados
+                            </Text>
+                        </Flex>
+                    ) : (
+                        <>
+                            <Table colorScheme='whiteAlpha'>
+                                <Thead>
+                                    <Tr>
+                                        <Th px={['4', '4', '6']} color='gray.300' w='8'>
+                                            <Checkbox colorScheme='pink' />
+                                        </Th>
+                                        <Th>
+                                            Usuário
+                                        </Th>
 
-                                {isWideVersion && <Th>Data de cadastro</Th>}
+                                        {isWideVersion && <Th>Data de cadastro</Th>}
 
-                                <Th>
-                                    Ações
-                                </Th>
-                            </Tr>
-                        </Thead>
+                                        <Th>
+                                            Ações
+                                        </Th>
+                                    </Tr>
+                                </Thead>
 
-                        <Tbody>
-                            <Tr>
-                                <Td px={['4', '4', '6']}>
-                                    <Checkbox colorScheme='pink' />
-                                </Td>
-                                <Td>
-                                    <Box>
-                                        <Text fontWeight='bold'>Rogério Marques</Text>
-                                        <Text fontWeight='normal' fontSize='sm' color='gray.300'>
-                                            rogerrm@teste.com
-                                            </Text>
-                                    </Box>
-                                </Td>
+                                <Tbody>
+                                    {data.map(user => (
+                                        <Tr key={user.id}>
+                                            <Td px={['4', '4', '6']}>
+                                                <Checkbox colorScheme='pink' />
+                                            </Td>
+                                            <Td>
+                                                <Box>
+                                                    <Text fontWeight='bold'>{user.name}</Text>
+                                                    <Text fontWeight='normal' fontSize='sm' color='gray.300'>
+                                                        {user.email}
+                                                    </Text>
+                                                </Box>
+                                            </Td>
 
-                                {isWideVersion && <Td>04 de Abril de 2021</Td>}
+                                            {isWideVersion && <Td>{user.createdAt}</Td>}
 
-                                <Td>
-                                    <Button
-                                        as='a'
-                                        size='sm'
-                                        fontSize='16'
-                                        colorScheme='yellow'
-                                        _hover={{ cursor: 'pointer' }}
-                                    >
-                                        <Icon as={RiPencilLine} />
-                                    </Button>
-                                </Td>
-                            </Tr>
-                            <Tr>
-                                <Td px={['4', '4', '6']}>
-                                    <Checkbox colorScheme='pink' />
-                                </Td>
-                                <Td>
-                                    <Box>
-                                        <Text fontWeight='bold'>Fernanda Espolleto</Text>
-                                        <Text fontWeight='normal' fontSize='sm' color='gray.300'>
-                                            fernandaspm@teste.com
-                                            </Text>
-                                    </Box>
-                                </Td>
+                                            <Td>
+                                                <Button
+                                                    as='a'
+                                                    size='sm'
+                                                    fontSize='16'
+                                                    colorScheme='yellow'
+                                                    _hover={{ cursor: 'pointer' }}>
+                                                    <Icon as={RiPencilLine} />
+                                                </Button>
+                                            </Td>
+                                        </Tr>
+                                    ))}
+                                </Tbody>
+                            </Table >
 
-                                {isWideVersion && <Td>04 de Abril de 2021</Td>}
-
-                                <Td>
-                                    <Button
-                                        as='a'
-                                        size='sm'
-                                        fontSize='16'
-                                        colorScheme='yellow'
-                                        _hover={{ cursor: 'pointer' }}
-                                    >
-                                        <Icon as={RiPencilLine} />
-                                    </Button>
-                                </Td>
-                            </Tr>
-                        </Tbody>
-                    </Table>
-
-                    <Pagination />
-                </Box>
-            </Flex>
-        </Box>
+                            <Pagination />
+                        </>
+                    )
+                    }
+                </Box >
+            </Flex >
+        </Box >
     )
 }
