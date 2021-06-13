@@ -1,6 +1,9 @@
-import { Box, Button, Divider, Flex, HStack, SimpleGrid, VStack } from "@chakra-ui/react";
-import Link from "next/link";
+// Defaults //
+import { Box, Button, Divider, Heading, Flex, HStack, SimpleGrid, VStack } from "@chakra-ui/react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import Link from "next/link";
+import { useMutation } from "react-query";
+import { useRouter } from "next/router";
 
 // Validações //
 import * as yup from 'yup'
@@ -9,10 +12,11 @@ import { yupResolver } from '@hookform/resolvers/yup'
 // Componentes //
 import { Input } from "../../components/Form/Input";
 import { Header } from "../../components/Header";
-import { Heading } from "../../components/Heading";
 import { Sidebar } from "../../components/Sidebar";
+import { api } from "../../services/api";
+import { queryClient } from "../../services/QueryClient";
 
-type CreateUserFormDate = {
+type CreateUserFormData = {
     name: string,
     email: string,
     password: string,
@@ -28,13 +32,28 @@ const createUserFormSchema = yup.object().shape({
 
 
 export default function CreateUser() {
+    const router = useRouter()
+
+    const createUser = useMutation(async (user: CreateUserFormData) => {
+        const response = await api.post('users', {
+            user: {
+                ...user,
+                created_at: new Date()
+            }
+        })
+
+        return response.data.user;
+    }, {
+        onSuccess: () => {
+            queryClient.invalidateQueries('users')
+        }
+    })
 
     const { register, handleSubmit, formState } = useForm({ resolver: yupResolver(createUserFormSchema) })
 
-    // Obs: async-await utilizado apenas para visualizar o efeito de loading durante o submit //
-    const handleCreateUser: SubmitHandler<CreateUserFormDate> = async (values) => {
-        const promisse = await new Promise(resolver => setTimeout(resolver, 5000))
-        alert(values)
+    const handleCreateUser: SubmitHandler<CreateUserFormData> = async (values) => {
+        await createUser.mutateAsync(values)
+        router.push('/users')
     }
 
     return (
@@ -52,7 +71,7 @@ export default function CreateUser() {
                     as='form'
                     onSubmit={handleSubmit(handleCreateUser)}>
 
-                    <Heading head='Novo usuário' />
+                    <Heading>Novo Usuário</Heading>
 
                     <Divider my='6' borderColor='gray.700' />
 

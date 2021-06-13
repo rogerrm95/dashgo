@@ -7,6 +7,7 @@ import { SidebarDrawerProvider } from '../contexts/SidebarDrawerContext'
 import { makeServer } from '../services/mirage' // MirageJS //
 import { QueryClient, QueryClientProvider } from 'react-query' // React-Query //
 import { ReactQueryDevtools } from 'react-query/devtools' // React-Query | Dev Tools //
+import { queryClient } from '../services/QueryClient'
 
 function MyApp({ Component, pageProps }: AppProps) {
 
@@ -14,7 +15,6 @@ function MyApp({ Component, pageProps }: AppProps) {
     makeServer()
   }
 
-  const queryClient = new QueryClient()
 
   return (
     <QueryClientProvider client={queryClient}>
