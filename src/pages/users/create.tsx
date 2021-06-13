@@ -46,6 +46,7 @@ export default function CreateUser() {
     }, {
         onSuccess: () => {
             queryClient.invalidateQueries('users')
+            router.push('/users')
         }
     })
 
